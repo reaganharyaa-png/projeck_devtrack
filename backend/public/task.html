@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task - Proyek Software</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#F6F7FB] text-[#1B1F3B]">
+  <div class="flex min-h-screen">
+    <aside class="hidden w-[232px] shrink-0 flex-col gap-1 border-r border-[#E7E9F2] bg-white px-4 py-7 md:flex">
+      <div class="px-3 pb-6 text-lg font-bold text-[#3730A3]">devTask</div>
+      <a href="index.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Dashboard</a>
+      <a href="task.html" class="rounded-lg px-3 py-[11px] text-sm bg-[#EEF0FF] font-semibold text-[#3730A3]">Task</a>
+      <a href="developer.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Developer</a>
+      <a href="role.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Role</a>
+      <a href="prioritas.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Prioritas</a>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+      <main class="flex flex-col gap-6 px-5 pb-28 pt-7 md:px-10 md:py-8">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-xs text-[#5B6080] md:hidden">Proyek Software</p>
+            <h1 class="text-[22px] font-bold md:text-[26px]">Task</h1>
+            <p class="mt-1 hidden text-sm text-[#5B6080] md:block">Semua task proyek beserta pemiliknya</p>
+          </div>
+          <a href="tambah-task.html" class="hidden md:inline-flex h-11 items-center rounded-lg bg-[#4F46E5] px-5 text-sm font-semibold text-white hover:opacity-90">+ Tambah Task</a>
+        </div>
+
+        <section class="flex gap-2 md:hidden"><div class="rounded-xl border border-[#E7E9F2] bg-white flex-1 px-3 py-2.5"><p class="text-xs text-[#5B6080]">Total</p><p class="text-xl font-bold ">4</p></div><div class="rounded-xl border border-[#E7E9F2] bg-white flex-1 px-3 py-2.5"><p class="text-xs text-[#5B6080]">Terlambat</p><p class="text-xl font-bold text-[#B42318]">3</p></div><div class="rounded-xl border border-[#E7E9F2] bg-white flex-1 px-3 py-2.5"><p class="text-xs text-[#5B6080]">Berjalan</p><p class="text-xl font-bold text-[#8A5300]">1</p></div></section>
+        <section class="hidden flex-wrap gap-3 md:flex">
+          <input type="search" aria-label="Cari task" placeholder="Cari nama task..." class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[300px]">
+          <select aria-label="Filter developer" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[170px]"><option>Semua developer</option><option>Andi</option><option>Budi</option><option>Tama</option></select>
+          <select aria-label="Filter prioritas" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[170px]"><option>Semua prioritas</option><option>Low</option><option>Medium</option><option>High</option></select>
+          <select aria-label="Filter status" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[170px]"><option>Semua status</option><option>Terlambat</option><option>Berjalan</option><option>Tepat waktu</option></select>
+                    <select aria-label="Tanggal yang dicari" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[170px]"><option value="deadline">Cari di: Deadline</option><option value="selesai">Cari di: Tgl selesai</option></select>
+          <label class="flex items-center gap-2 text-sm text-[#5B6080]">Dari <input type="date" aria-label="Dari tanggal" class="h-11 rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"></label>
+          <label class="flex items-center gap-2 text-sm text-[#5B6080]">Sampai <input type="date" aria-label="Sampai tanggal" class="h-11 rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"></label>
+          <button type="button" id="resetFilter" class="h-11 rounded-lg border border-[#8A90AD] bg-white px-4 text-sm font-semibold text-[#1B1F3B]">Reset</button>
+        </section>
+
+        <section class="rounded-xl border border-[#E7E9F2] bg-white hidden overflow-hidden md:block">
+          <div class="overflow-x-auto">
+        <table class="w-full min-w-[820px] text-left text-sm">
+          <thead class="bg-[#F3F4FA] text-xs font-semibold text-[#5B6080]"><tr><th class="px-4 py-2.5">ID</th><th class="px-4 py-2.5">Task</th><th class="px-4 py-2.5">Developer</th><th class="px-4 py-2.5">Prioritas</th><th class="px-4 py-2.5">Deadline</th><th class="px-4 py-2.5">Selesai</th><th class="px-4 py-2.5">Status</th><th class="px-4 py-2.5">Aksi</th></tr></thead>
+          <tbody class="divide-y divide-[#E7E9F2]">
+            <tr>
+              <td class="px-4 py-3.5">Task01</td><td class="px-4 py-3.5">Setup Project Repository</td>
+              <td class="px-4 py-3.5">Andi<div class="text-xs text-[#5B6080]">Frontend</div></td>
+              <td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#EEF0F6] px-2.5 py-[3px] text-xs font-semibold text-[#4A5070]">Low</span></td><td class="px-4 py-3.5">06 Agu 2026</td><td class="px-4 py-3.5">11 Agu 2026</td><td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#FDECEA] px-2.5 py-[3px] text-xs font-semibold text-[#B42318]">Terlambat</span></td>
+              <td class="px-4 py-3.5"><a href="#" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Ubah</a><a href="#" class="text-[13px] font-semibold text-[#B42318]">Hapus</a></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3.5">Task02</td><td class="px-4 py-3.5">Membuat endpoint login</td>
+              <td class="px-4 py-3.5">Budi<div class="text-xs text-[#5B6080]">Backend</div></td>
+              <td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#E6EEFF] px-2.5 py-[3px] text-xs font-semibold text-[#2547B8]">Medium</span></td><td class="px-4 py-3.5">12 Agu 2026</td><td class="px-4 py-3.5">14 Agu 2026</td><td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#FDECEA] px-2.5 py-[3px] text-xs font-semibold text-[#B42318]">Terlambat</span></td>
+              <td class="px-4 py-3.5"><a href="#" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Ubah</a><a href="#" class="text-[13px] font-semibold text-[#B42318]">Hapus</a></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3.5">Task03</td><td class="px-4 py-3.5">Mendesain halaman dashboard</td>
+              <td class="px-4 py-3.5">Tama<div class="text-xs text-[#5B6080]">Fullstack</div></td>
+              <td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#F1E8FF] px-2.5 py-[3px] text-xs font-semibold text-[#6B2FB3]">High</span></td><td class="px-4 py-3.5">20 Agu 2026</td><td class="px-4 py-3.5">-</td><td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#FFF3D6] px-2.5 py-[3px] text-xs font-semibold text-[#8A5300]">Berjalan</span></td>
+              <td class="px-4 py-3.5"><a href="#" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Ubah</a><a href="#" class="text-[13px] font-semibold text-[#B42318]">Hapus</a></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3.5">Task04</td><td class="px-4 py-3.5">Implementasi role &amp; permission</td>
+              <td class="px-4 py-3.5">Andi<div class="text-xs text-[#5B6080]">Frontend</div></td>
+              <td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#E6EEFF] px-2.5 py-[3px] text-xs font-semibold text-[#2547B8]">Medium</span></td><td class="px-4 py-3.5">15 Agu 2026</td><td class="px-4 py-3.5">17 Agu 2026</td><td class="px-4 py-3.5"><span class="inline-block rounded-full bg-[#FDECEA] px-2.5 py-[3px] text-xs font-semibold text-[#B42318]">Terlambat</span></td>
+              <td class="px-4 py-3.5"><a href="#" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Ubah</a><a href="#" class="text-[13px] font-semibold text-[#B42318]">Hapus</a></td>
+            </tr>
+          </tbody>
+        </table>
+          </div>
+          <p class="border-t border-[#E7E9F2] px-4 py-3 text-xs text-[#5B6080]">Menampilkan 4 dari 4 task</p>
+        </section>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <script>
+function $(selector) { return document.querySelector(selector); }
+function $$(selector) { return document.querySelectorAll(selector); }
+
+function aman(teks) {
+  if (teks === undefined || teks === null) { return '-'; }
+  return String(teks).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function tanggalIndonesia(iso) {
+  if (!iso) { return '-'; }
+  var bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  var bagian = iso.split('-');
+  return bagian[2] + ' ' + bulan[Number(bagian[1]) - 1] + ' ' + bagian[0];
+}
+
+function cari(daftar, id) {
+  for (var i = 0; i < daftar.length; i++) {
+    if (String(daftar[i].id) === String(id)) { return daftar[i]; }
+  }
+  return null;
+}
+
+var warnaStatus = {
+  'Terlambat': 'bg-[#FDECEA] text-[#B42318]',
+  'Berjalan': 'bg-[#FFF3D6] text-[#8A5300]',
+  'Tepat waktu': 'bg-[#E3F6EE] text-[#0F6B4A]'
+};
+var warnaPrioritas = [
+  'bg-[#EEF0F6] text-[#4A5070]',
+  'bg-[#E6EEFF] text-[#2547B8]',
+  'bg-[#F1E8FF] text-[#6B2FB3]',
+  'bg-[#FFE8D6] text-[#B54708]',
+  'bg-[#E3F6EE] text-[#0F6B4A]',
+  'bg-[#FCE7F3] text-[#BE185D]'
+];
+
+function lencana(warna, teks) {
+  return '<span class="inline-block rounded-full ' + warna + ' px-2.5 py-[3px] text-xs font-semibold">' + aman(teks) + '</span>';
+}
+
+function lencanaPrioritas(t) {
+  if (!t.namaPrioritas) { return '-'; }
+  return lencana(warnaPrioritas[(t.prioritasId - 1) % warnaPrioritas.length], t.namaPrioritas);
+}
+
+function buatBaris(kolom) {
+  var html = '<tr>';
+  for (var i = 0; i < kolom.length; i++) {
+    html = html + '<td class="px-4 py-3.5">' + kolom[i] + '</td>';
+  }
+  return html + '</tr>';
+}
+
+function gabungBaris(daftarBaris, jumlahKolom) {
+  if (daftarBaris.length === 0) {
+    return '<tr><td colspan="' + jumlahKolom + '" class="px-4 py-6 text-center text-sm text-[#5B6080]">Belum ada data</td></tr>';
+  }
+  return daftarBaris.join('');
+}
+
+function tombolAksi(id) {
+  return '<a href="#" data-aksi="ubah" data-id="' + id + '" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Ubah</a>' +
+         '<a href="#" data-aksi="hapus" data-id="' + id + '" class="text-[13px] font-semibold text-[#B42318]">Hapus</a>';
+}
+
+function pasangTombolAksi(fungsiUbah, fungsiHapus) {
+  document.addEventListener('click', function (e) {
+    var tombol = e.target.closest('[data-aksi]');
+    if (tombol === null) { return; }
+    e.preventDefault();
+    var id = tombol.getAttribute('data-id');
+    if (tombol.getAttribute('data-aksi') === 'ubah') {
+      fungsiUbah(id);
+    } else {
+      fungsiHapus(id);
+    }
+  });
+}
+
+document.head.insertAdjacentHTML('beforeend', "<style>.swal2-popup{font-family:'Plus Jakarta Sans',sans-serif}</style>");
+
+function popupSukses(judul, teks, setelahTutup) {
+  Swal.fire({
+    icon: 'success',
+    title: judul,
+    text: teks,
+    timer: 1600,
+    timerProgressBar: true,
+    showConfirmButton: false
+  }).then(function () {
+    if (setelahTutup) { setelahTutup(); }
+  });
+}
+
+function popupPeringatan(teks, judul) {
+  return Swal.fire({
+    icon: 'warning',
+    title: judul || 'Perhatian',
+    text: teks,
+    confirmButtonText: 'Mengerti',
+    confirmButtonColor: '#4F46E5'
+  });
+}
+
+function popupKonfirmasi(judul, teks, untukHapus, kalauYa) {
+  Swal.fire({
+    icon: untukHapus ? 'warning' : 'question',
+    title: judul,
+    text: teks,
+    showCancelButton: true,
+    confirmButtonText: untukHapus ? 'Ya, hapus' : 'Ya, ubah',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: untukHapus ? '#B42318' : '#4F46E5',
+    cancelButtonColor: '#8A90AD',
+    reverseButtons: true
+  }).then(function (hasil) {
+    if (hasil.isConfirmed) { kalauYa(); }
+  });
+}
+
+function isiKartu(bagianKartu, daftarAngka) {
+  for (var i = 0; i < daftarAngka.length; i++) {
+    var teks = bagianKartu.children[i].querySelectorAll('p');
+    teks[teks.length - 1].textContent = daftarAngka[i];
+  }
+}
+
+var daftarTask = [];
+var bagian = $$('main > section');
+var kolomCari = $('input[type=search]');
+var filterDev = $('[aria-label="Filter developer"]');
+var filterPrioritas = $('[aria-label="Filter prioritas"]');
+var filterStatus = $('[aria-label="Filter status"]');
+var filterDasar = $('[aria-label="Tanggal yang dicari"]');
+var tglDari = $('[aria-label="Dari tanggal"]');
+var tglSampai = $('[aria-label="Sampai tanggal"]');
+var tombolReset = $('#resetFilter');
+
+filterStatus.innerHTML = '<option value="">Semua status</option><option>Terlambat</option><option>Berjalan</option><option>Tepat waktu</option>';
+
+function hitungStatus(status) {
+  var jumlah = 0;
+  for (var i = 0; i < daftarTask.length; i++) {
+    if (daftarTask[i].status === status) { jumlah++; }
+  }
+  return jumlah;
+}
+
+function isiFilter(pilihan, teksSemua, daftar) {
+  var terpilih = pilihan.value;
+  var html = '<option value="">' + teksSemua + '</option>';
+  for (var i = 0; i < daftar.length; i++) {
+    html += '<option value="' + aman(daftar[i].id) + '">' + aman(daftar[i].nama) + '</option>';
+  }
+  pilihan.innerHTML = html;
+  pilihan.value = terpilih;
+  if (pilihan.selectedIndex === -1) { pilihan.selectedIndex = 0; }
+}
+
+function barisTask(t) {
+  return buatBaris([
+    aman(t.id),
+    aman(t.nama),
+    aman(t.namaDeveloper) + '<div class="text-xs text-[#5B6080]">' + aman(t.namaRole) + '</div>',
+    lencanaPrioritas(t),
+    tanggalIndonesia(t.deadline),
+    tanggalIndonesia(t.selesai),
+    lencana(warnaStatus[t.status], t.status),
+    tombolAksi(t.id)
+  ]);
+}
+
+async function muatData() {
+  try {
+    var hasil = await Promise.all([
+      panggilApi('/task'),
+      panggilApi('/developer'),
+      panggilApi('/prioritas')
+    ]);
+    daftarTask = hasil[0];
+    isiFilter(filterDev, 'Semua developer', hasil[1]);
+    isiFilter(filterPrioritas, 'Semua prioritas', hasil[2]);
+    tampilkan();
+  } catch (error) {
+    daftarTask = [];
+    tampilkan();
+    popupPeringatan(error.message, 'Gagal memuat data');
+  }
+}
+
+function tampilkan() {
+  isiKartu(bagian[0], [daftarTask.length, hitungStatus('Terlambat'), hitungStatus('Berjalan')]);
+
+  var kataKunci = kolomCari.value.trim().toLowerCase();
+  var dasar = filterDasar.value;
+  var dari = tglDari.value;
+  var sampai = tglSampai.value;
+
+  tglSampai.min = dari;
+  tglDari.max = sampai;
+
+  var baris = [];
+  for (var k = 0; k < daftarTask.length; k++) {
+    var t = daftarTask[k];
+    var cocok = true;
+    if (t.nama.toLowerCase().indexOf(kataKunci) === -1) { cocok = false; }
+    if (filterDev.value !== '' && t.developerId !== filterDev.value) { cocok = false; }
+    if (filterPrioritas.value !== '' && String(t.prioritasId) !== filterPrioritas.value) { cocok = false; }
+    if (filterStatus.value !== '' && t.status !== filterStatus.value) { cocok = false; }
+
+    if (dari !== '' || sampai !== '') {
+      var tanggal = t[dasar];
+      if (tanggal === '') {
+        cocok = false;
+      } else {
+        if (dari !== '' && tanggal < dari) { cocok = false; }
+        if (sampai !== '' && tanggal > sampai) { cocok = false; }
+      }
+    }
+
+    if (cocok) { baris.push(barisTask(t)); }
+  }
+  $('tbody').innerHTML = gabungBaris(baris, 8);
+  $('p.border-t').textContent = 'Menampilkan ' + baris.length + ' dari ' + daftarTask.length + ' task';
+}
+
+kolomCari.addEventListener('input', tampilkan);
+filterDev.addEventListener('change', tampilkan);
+filterPrioritas.addEventListener('change', tampilkan);
+filterStatus.addEventListener('change', tampilkan);
+filterDasar.addEventListener('change', tampilkan);
+tglDari.addEventListener('change', tampilkan);
+tglSampai.addEventListener('change', tampilkan);
+
+tombolReset.addEventListener('click', function () {
+  kolomCari.value = '';
+  filterDev.value = '';
+  filterPrioritas.value = '';
+  filterStatus.value = '';
+  filterDasar.value = 'deadline';
+  tglDari.value = '';
+  tglSampai.value = '';
+  tampilkan();
+});
+
+function ubahTask(id) {
+  var t = cari(daftarTask, id);
+  popupKonfirmasi('Apakah anda yakin untuk mengubah task ini?', t.id + ' - ' + t.nama, false, function () {
+    window.location.href = 'tambah-task.html?edit=' + encodeURIComponent(id);
+  });
+}
+
+function hapusTask(id) {
+  var t = cari(daftarTask, id);
+  popupKonfirmasi('Apakah anda yakin untuk menghapus task ini?', t.id + ' - ' + t.nama, true, async function () {
+    try {
+      await panggilApi('/task/' + encodeURIComponent(t.id), 'DELETE');
+      await muatData();
+      popupSukses('Task berhasil dihapus!', t.id + ' - ' + t.nama);
+    } catch (error) {
+      popupPeringatan(error.message, 'Task gagal dihapus');
+    }
+  });
+}
+
+pasangTombolAksi(ubahTask, hapusTask);
+muatData();
+  </script>
+</body>
+</html>

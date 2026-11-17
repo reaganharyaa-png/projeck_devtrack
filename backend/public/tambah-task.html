@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tambah Task - Proyek Software</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#F6F7FB] text-[#1B1F3B]">
+  <header class="border-b border-[#E7E9F2] bg-white px-5 py-5 md:px-10">
+    <a href="index.html" class="text-sm text-[#3730A3]">&larr; Kembali ke Dashboard</a>
+    <h1 class="mt-2 text-2xl font-bold">Tambah Task</h1>
+  </header>
+
+  <main class="flex flex-col items-start gap-6 px-5 py-8 md:px-10 lg:flex-row">
+    <form class="rounded-xl border border-[#E7E9F2] bg-white w-full max-w-[720px] p-7">
+      <div class="grid gap-5 md:grid-cols-2">
+        <div class=""><label for="id" class="mb-1.5 block text-[13px] font-semibold">ID Task</label><input id="id" value="Task05" readonly class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] bg-[#F3F4FA]"><p class="mt-1.5 text-xs text-[#5B6080]">Dibuat otomatis</p></div>
+        <div class=""><label for="sp" class="mb-1.5 block text-[13px] font-semibold">Story point</label><input id="sp" type="number" min="1" value="3" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"></div>
+        <div class="md:col-span-2"><label for="nm" class="mb-1.5 block text-[13px] font-semibold">Nama task</label><input id="nm" type="text" placeholder="Contoh: Membuat API user profile" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"></div>
+        <div class=""><label for="dv" class="mb-1.5 block text-[13px] font-semibold">Developer</label><select id="dv" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><option>Dev01 - Andi (Frontend)</option><option>Dev02 - Budi (Backend)</option><option>Dev03 - Tama (Fullstack)</option></select></div>
+        <div class=""><label for="pr" class="mb-1.5 block text-[13px] font-semibold">Prioritas</label><select id="pr" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><option>Low</option><option>Medium</option><option>High</option></select></div>
+        <div class=""><label for="dl" class="mb-1.5 block text-[13px] font-semibold">Deadline</label><input id="dl" type="date" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"></div>
+        <div class=""><label for="ts" class="mb-1.5 block text-[13px] font-semibold">Tanggal selesai</label><input id="ts" type="date" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><p class="mt-1.5 text-xs text-[#5B6080]">Kosongkan jika task belum selesai</p></div>
+      </div>
+      <div class="mt-7 flex justify-end gap-3">
+        <a href="index.html" class="inline-flex h-11 items-center rounded-lg border border-[#8A90AD] bg-white px-5 text-sm font-semibold">Batal</a>
+        <button type="submit" class="h-11 rounded-lg bg-[#4F46E5] px-6 text-sm font-semibold text-white hover:opacity-90">Simpan Task</button>
+      </div>
+    </form>
+
+    <aside class="rounded-xl border border-[#E7E9F2] bg-white w-full self-start p-5 text-[13px] leading-[1.6] lg:w-[300px]">
+      <h2 class="mb-2 text-sm font-semibold">Catatan</h2>
+      <p><b>Developer</b> diambil dari tabel developer.</p>
+      <p class="mt-2"><b>Prioritas</b> diambil dari tabel priority.</p>
+      <p class="mt-2"><b>Status</b> tidak diisi manual. Dihitung dari deadline dan tanggal selesai.</p>
+    </aside>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <script>
+function $(selector) { return document.querySelector(selector); }
+
+function aman(teks) {
+  if (teks === undefined || teks === null) { return '-'; }
+  return String(teks).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+document.head.insertAdjacentHTML('beforeend', "<style>.swal2-popup{font-family:'Plus Jakarta Sans',sans-serif}</style>");
+
+function popupSukses(judul, teks, setelahTutup) {
+  Swal.fire({
+    icon: 'success',
+    title: judul,
+    text: teks,
+    timer: 1600,
+    timerProgressBar: true,
+    showConfirmButton: false
+  }).then(function () {
+    if (setelahTutup) { setelahTutup(); }
+  });
+}
+
+function popupPeringatan(teks, judul) {
+  return Swal.fire({
+    icon: 'warning',
+    title: judul || 'Perhatian',
+    text: teks,
+    confirmButtonText: 'Mengerti',
+    confirmButtonColor: '#4F46E5'
+  });
+}
+
+function peringatanForm(pesan, kolomSelector) {
+  popupPeringatan(pesan, 'Data belum lengkap').then(function () {
+    if (kolomSelector) { $(kolomSelector).focus(); }
+  });
+}
+
+var form = $('form');
+var tombolSubmit = $('button[type=submit]');
+var idEdit = new URLSearchParams(window.location.search).get('edit');
+
+async function siapkanForm() {
+  tombolSubmit.disabled = true;
+  try {
+    if (idEdit !== null) {
+      var pengguna = await ambilPengguna();
+      if (pengguna.level !== 'admin') {
+        await popupPeringatan('Hanya admin yang boleh mengubah data.', 'Akses ditolak');
+        window.location.href = 'task.html';
+        return;
+      }
+    }
+
+    var hasil = await Promise.all([
+      panggilApi('/developer'),
+      panggilApi('/prioritas')
+    ]);
+    var daftarDev = hasil[0];
+    var daftarPrioritas = hasil[1];
+
+    var pilihanDev = '';
+    for (var i = 0; i < daftarDev.length; i++) {
+      var d = daftarDev[i];
+      pilihanDev += '<option value="' + aman(d.id) + '">' + aman(d.id) + ' - ' + aman(d.nama) + ' (' + aman(d.namaRole) + ')</option>';
+    }
+    $('#dv').innerHTML = pilihanDev;
+
+    var pilihanPrioritas = '';
+    for (var j = 0; j < daftarPrioritas.length; j++) {
+      pilihanPrioritas += '<option value="' + daftarPrioritas[j].id + '">' + aman(daftarPrioritas[j].nama) + '</option>';
+    }
+    $('#pr').innerHTML = pilihanPrioritas;
+
+    if (idEdit !== null) {
+      var t = await panggilApi('/task/' + encodeURIComponent(idEdit));
+      $('#id').value = t.id;
+      $('#sp').value = t.poin;
+      $('#nm').value = t.nama;
+      $('#dv').value = t.developerId;
+      $('#pr').value = t.prioritasId;
+      $('#dl').value = t.deadline;
+      $('#ts').value = t.selesai;
+      $('header h1').textContent = 'Ubah Task';
+      tombolSubmit.textContent = 'Simpan Perubahan';
+    } else {
+      var berikut = await panggilApi('/task/id-berikutnya');
+      $('#id').value = berikut.id;
+    }
+    tombolSubmit.disabled = false;
+  } catch (error) {
+    popupPeringatan(error.message, 'Gagal memuat form');
+  }
+}
+
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  if (tombolSubmit.disabled) { return; }
+
+  var nama = $('#nm').value.trim();
+  var poin = Number($('#sp').value);
+  var developerId = $('#dv').value;
+  var prioritasId = Number($('#pr').value);
+  var deadline = $('#dl').value;
+  var selesai = $('#ts').value;
+
+  if (nama === '') { peringatanForm('Nama task wajib diisi.', '#nm'); return; }
+  if (!Number.isInteger(poin) || poin < 1) { peringatanForm('Story point harus bilangan bulat, minimal 1.', '#sp'); return; }
+  if (developerId === '') { peringatanForm('Belum ada developer. Tambah developer dulu.'); return; }
+  if (!prioritasId) { peringatanForm('Belum ada prioritas. Tambah prioritas dulu.'); return; }
+  if (deadline === '') { peringatanForm('Deadline wajib diisi.', '#dl'); return; }
+
+  var isi = {
+    nama: nama,
+    poin: poin,
+    developerId: developerId,
+    prioritasId: prioritasId,
+    deadline: deadline,
+    selesai: selesai
+  };
+
+  tombolSubmit.disabled = true;
+  try {
+    var hasil;
+    var pesan;
+    var tujuan;
+    if (idEdit !== null) {
+      hasil = await panggilApi('/task/' + encodeURIComponent(idEdit), 'PUT', isi);
+      pesan = 'Task berhasil diubah!';
+      tujuan = 'task.html';
+    } else {
+      hasil = await panggilApi('/task', 'POST', isi);
+      pesan = 'Task berhasil disimpan!';
+      tujuan = 'index.html';
+    }
+    popupSukses(pesan, hasil.id + ' - ' + nama, function () {
+      window.location.href = tujuan;
+    });
+  } catch (error) {
+    popupPeringatan(error.message, 'Task gagal disimpan');
+    tombolSubmit.disabled = false;
+  }
+});
+
+siapkanForm();
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tambah Developer - Proyek Software</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#F6F7FB] text-[#1B1F3B]">
+  <header class="border-b border-[#E7E9F2] bg-white px-5 py-5 md:px-10">
+    <a href="developer.html" class="text-sm text-[#3730A3]">&larr; Kembali ke Developer</a>
+    <h1 class="mt-2 text-2xl font-bold">Tambah Developer</h1>
+  </header>
+
+  <main class="flex flex-col items-start gap-6 px-5 py-8 md:px-10 lg:flex-row">
+    <form class="rounded-xl border border-[#E7E9F2] bg-white w-full max-w-[720px] p-7">
+      <div class="grid gap-5 md:grid-cols-2">
+        <div class=""><label for="id" class="mb-1.5 block text-[13px] font-semibold">ID Developer</label><input id="id" value="Dev04" readonly class="h-11 w-full rounded-lg border border-[#8A90AD] bg-[#F3F4FA] px-3 text-sm text-[#1B1F3B]"><p class="mt-1.5 text-xs text-[#5B6080]">Dibuat otomatis</p></div>
+        <div class=""><label for="rl" class="mb-1.5 block text-[13px] font-semibold">Role</label><select id="rl" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><option>Frontend</option><option>Backend</option><option>Fullstack</option></select></div>
+        <div class="md:col-span-2"><label for="nm" class="mb-1.5 block text-[13px] font-semibold">Nama developer</label><input id="nm" type="text" placeholder="Contoh: Andi" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"></div>
+        <div class=""><label for="cp" class="mb-1.5 block text-[13px] font-semibold">Capacity point</label><input id="cp" type="number" min="1" value="20" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><p class="mt-1.5 text-xs text-[#5B6080]">Jumlah poin kerja maksimal yang bisa diambil developer</p></div>
+      </div>
+      <div class="mt-7 flex justify-end gap-3">
+        <a href="developer.html" class="inline-flex h-11 items-center rounded-lg border border-[#8A90AD] bg-white px-5 text-sm font-semibold">Batal</a>
+        <button type="submit" class="h-11 rounded-lg bg-[#4F46E5] px-6 text-sm font-semibold text-white hover:opacity-90">Simpan Developer</button>
+      </div>
+    </form>
+
+    <aside class="rounded-xl border border-[#E7E9F2] bg-white w-full self-start p-5 text-[13px] leading-[1.6] lg:w-[300px]">
+      <h2 class="mb-2 text-sm font-semibold">Catatan</h2>
+      <p><b>Role</b> diambil dari tabel role. Role baru bisa ditambah di halaman <a href="role.html" class="font-semibold text-[#3730A3]">Role</a>.</p>
+      <p class="mt-2"><b>Capacity point</b> dipakai untuk menghitung beban kerja developer di Dashboard.</p>
+      <p class="mt-2"><b>ID</b> dibuat otomatis oleh sistem.</p>
+    </aside>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <script>
+function $(selector) { return document.querySelector(selector); }
+
+function aman(teks) {
+  if (teks === undefined || teks === null) { return '-'; }
+  return String(teks).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+document.head.insertAdjacentHTML('beforeend', "<style>.swal2-popup{font-family:'Plus Jakarta Sans',sans-serif}</style>");
+
+function popupSukses(judul, teks, setelahTutup) {
+  Swal.fire({
+    icon: 'success',
+    title: judul,
+    text: teks,
+    timer: 1600,
+    timerProgressBar: true,
+    showConfirmButton: false
+  }).then(function () {
+    if (setelahTutup) { setelahTutup(); }
+  });
+}
+
+function popupPeringatan(teks, judul) {
+  return Swal.fire({
+    icon: 'warning',
+    title: judul || 'Perhatian',
+    text: teks,
+    confirmButtonText: 'Mengerti',
+    confirmButtonColor: '#4F46E5'
+  });
+}
+
+function peringatanForm(pesan, kolomSelector) {
+  popupPeringatan(pesan, 'Data belum lengkap').then(function () {
+    if (kolomSelector) { $(kolomSelector).focus(); }
+  });
+}
+
+var form = $('form');
+var tombolSubmit = $('button[type=submit]');
+var idEdit = new URLSearchParams(window.location.search).get('edit');
+
+async function siapkanForm() {
+  tombolSubmit.disabled = true;
+  try {
+    if (idEdit !== null) {
+      var pengguna = await ambilPengguna();
+      if (pengguna.level !== 'admin') {
+        await popupPeringatan('Hanya admin yang boleh mengubah data.', 'Akses ditolak');
+        window.location.href = 'developer.html';
+        return;
+      }
+    }
+
+    var daftarRole = await panggilApi('/role');
+    var pilihanRole = '';
+    for (var i = 0; i < daftarRole.length; i++) {
+      pilihanRole += '<option value="' + daftarRole[i].id + '">' + aman(daftarRole[i].nama) + '</option>';
+    }
+    $('#rl').innerHTML = pilihanRole;
+
+    if (idEdit !== null) {
+      var dev = await panggilApi('/developer/' + encodeURIComponent(idEdit));
+      $('#id').value = dev.id;
+      $('#rl').value = dev.roleId;
+      $('#nm').value = dev.nama;
+      $('#cp').value = dev.kapasitas;
+      $('header h1').textContent = 'Ubah Developer';
+      tombolSubmit.textContent = 'Simpan Perubahan';
+    } else {
+      var berikut = await panggilApi('/developer/id-berikutnya');
+      $('#id').value = berikut.id;
+    }
+    tombolSubmit.disabled = false;
+  } catch (error) {
+    popupPeringatan(error.message, 'Gagal memuat form');
+  }
+}
+
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  if (tombolSubmit.disabled) { return; }
+
+  var nama = $('#nm').value.trim();
+  var roleId = Number($('#rl').value);
+  var kapasitas = Number($('#cp').value);
+
+  if (nama === '') { peringatanForm('Nama developer wajib diisi.', '#nm'); return; }
+  if (!roleId) { peringatanForm('Belum ada role. Tambah role dulu.'); return; }
+  if (!Number.isInteger(kapasitas) || kapasitas < 1) { peringatanForm('Capacity point harus bilangan bulat, minimal 1.', '#cp'); return; }
+
+  var isi = { nama: nama, roleId: roleId, kapasitas: kapasitas };
+
+  tombolSubmit.disabled = true;
+  try {
+    var hasil;
+    var pesan;
+    if (idEdit !== null) {
+      hasil = await panggilApi('/developer/' + encodeURIComponent(idEdit), 'PUT', isi);
+      pesan = 'Developer berhasil diubah!';
+    } else {
+      hasil = await panggilApi('/developer', 'POST', isi);
+      pesan = 'Developer berhasil disimpan!';
+    }
+    popupSukses(pesan, hasil.id + ' - ' + nama, function () {
+      window.location.href = 'developer.html';
+    });
+  } catch (error) {
+    popupPeringatan(error.message, 'Developer gagal disimpan');
+    tombolSubmit.disabled = false;
+  }
+});
+
+siapkanForm();
+  </script>
+</body>
+</html>

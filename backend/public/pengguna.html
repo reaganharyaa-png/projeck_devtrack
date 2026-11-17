@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengguna - Proyek Software</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#F6F7FB] text-[#1B1F3B]">
+  <div id="halaman" class="invisible flex min-h-screen">
+
+    <aside class="hidden w-[232px] shrink-0 flex-col gap-1 border-r border-[#E7E9F2] bg-white px-4 py-7 md:flex">
+      <div class="px-3 pb-6 text-lg font-bold text-[#3730A3]">devTask</div>
+      <a href="index.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Dashboard</a>
+      <a href="task.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Task</a>
+      <a href="developer.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Developer</a>
+      <a href="role.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Role</a>
+      <a href="prioritas.html" class="rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]">Prioritas</a>
+      <a href="pengguna.html" class="rounded-lg px-3 py-[11px] text-sm bg-[#EEF0FF] font-semibold text-[#3730A3]">Pengguna</a>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+      <main class="flex flex-col gap-6 px-5 pb-28 pt-7 md:px-10 md:py-8">
+        <div>
+          <p class="text-xs text-[#5B6080] md:hidden">Proyek Software</p>
+          <h1 class="text-[22px] font-bold md:text-[26px]">Pengguna</h1>
+          <p class="mt-1 hidden text-sm text-[#5B6080] md:block">Kelola level akses dan password pengguna</p>
+        </div>
+
+        <section class="overflow-hidden rounded-xl border border-[#E7E9F2] bg-white">
+          <div class="flex flex-wrap gap-3 border-b border-[#E7E9F2] p-3">
+            <input type="search" aria-label="Cari pengguna" placeholder="Cari username atau nama..." class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[300px]">
+            <select aria-label="Filter level" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B] sm:w-[170px]">
+              <option value="">Semua level</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[760px] text-left text-sm">
+              <thead class="bg-[#F3F4FA] text-xs font-semibold text-[#5B6080]"><tr><th class="px-4 py-2.5">ID</th><th class="px-4 py-2.5">Username</th><th class="px-4 py-2.5">Nama lengkap</th><th class="px-4 py-2.5">Level</th><th class="px-4 py-2.5">Lupa password</th><th class="px-4 py-2.5">Tindakan</th></tr></thead>
+              <tbody class="divide-y divide-[#E7E9F2]"></tbody>
+            </table>
+          </div>
+          <div class="border-t border-[#E7E9F2] px-4 py-3 text-xs text-[#5B6080]">
+            <p id="infoJumlah"></p>
+            <p class="mt-1">Perubahan level berlaku setelah pengguna yang bersangkutan masuk ulang. Akun tanpa pertanyaan keamanan tidak bisa memakai Lupa password, jadi password-nya direset oleh admin di sini.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <script>
+function $(selector) { return document.querySelector(selector); }
+
+function aman(teks) {
+  if (teks === undefined || teks === null) { return '-'; }
+  return String(teks).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function cari(daftar, id) {
+  for (var i = 0; i < daftar.length; i++) {
+    if (String(daftar[i].id) === String(id)) { return daftar[i]; }
+  }
+  return null;
+}
+
+function lencana(warna, teks) {
+  return '<span class="inline-block rounded-full ' + warna + ' px-2.5 py-[3px] text-xs font-semibold">' + aman(teks) + '</span>';
+}
+
+function buatBaris(kolom) {
+  var html = '<tr>';
+  for (var i = 0; i < kolom.length; i++) {
+    html = html + '<td class="px-4 py-3.5">' + kolom[i] + '</td>';
+  }
+  return html + '</tr>';
+}
+
+function gabungBaris(daftarBaris, jumlahKolom) {
+  if (daftarBaris.length === 0) {
+    return '<tr><td colspan="' + jumlahKolom + '" class="px-4 py-6 text-center text-sm text-[#5B6080]">Belum ada data</td></tr>';
+  }
+  return daftarBaris.join('');
+}
+
+document.head.insertAdjacentHTML('beforeend', "<style>.swal2-popup{font-family:'Plus Jakarta Sans',sans-serif}</style>");
+
+function popupSukses(judul, teks) {
+  Swal.fire({
+    icon: 'success',
+    title: judul,
+    text: teks,
+    timer: 1600,
+    timerProgressBar: true,
+    showConfirmButton: false
+  });
+}
+
+function popupPeringatan(teks, judul) {
+  return Swal.fire({
+    icon: 'warning',
+    title: judul || 'Perhatian',
+    text: teks,
+    confirmButtonText: 'Mengerti',
+    confirmButtonColor: '#4F46E5'
+  });
+}
+
+var daftarPengguna = [];
+var akuSendiri = null;
+var kolomCari = $('[aria-label="Cari pengguna"]');
+var filterLevel = $('[aria-label="Filter level"]');
+
+function lencanaLevel(level) {
+  if (level === 'admin') { return lencana('bg-[#F1E8FF] text-[#6B2FB3]', 'Admin'); }
+  return lencana('bg-[#EEF0F6] text-[#4A5070]', 'User');
+}
+
+function lencanaPertanyaan(ada) {
+  if (ada) { return lencana('bg-[#E3F6EE] text-[#0F6B4A]', 'Sudah diatur'); }
+  return lencana('bg-[#FFF3D6] text-[#8A5300]', 'Belum ada');
+}
+
+function tombolTindakan(p) {
+  var html = '';
+  if (Number(p.id) === Number(akuSendiri.id)) {
+    html = html + '<span class="mr-3 text-xs text-[#5B6080]">Akunmu</span>';
+  } else if (p.level === 'admin') {
+    html = html + '<a href="#" data-tindakan="level" data-id="' + p.id + '" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Jadikan User</a>';
+  } else {
+    html = html + '<a href="#" data-tindakan="level" data-id="' + p.id + '" class="mr-3 text-[13px] font-semibold text-[#3730A3]">Jadikan Admin</a>';
+  }
+  html = html + '<a href="#" data-tindakan="password" data-id="' + p.id + '" class="text-[13px] font-semibold text-[#8A5300]">Reset password</a>';
+  return html;
+}
+
+async function muatData() {
+  try {
+    daftarPengguna = await panggilApi('/pengguna');
+    tampilkan();
+  } catch (error) {
+    $('tbody').innerHTML = gabungBaris([], 6);
+    popupPeringatan(error.message, 'Gagal memuat data');
+  }
+}
+
+function tampilkan() {
+  var kataKunci = kolomCari.value.trim().toLowerCase();
+  var baris = [];
+  for (var i = 0; i < daftarPengguna.length; i++) {
+    var p = daftarPengguna[i];
+    var cocok = true;
+    if ((p.username + ' ' + p.nama + ' ' + p.id).toLowerCase().indexOf(kataKunci) === -1) { cocok = false; }
+    if (filterLevel.value !== '' && p.level !== filterLevel.value) { cocok = false; }
+    if (cocok) {
+      var penanda = '';
+      if (Number(p.id) === Number(akuSendiri.id)) { penanda = ' <span class="text-xs text-[#5B6080]">(kamu)</span>'; }
+      baris.push(buatBaris([
+        p.id,
+        aman(p.username) + penanda,
+        aman(p.nama),
+        lencanaLevel(p.level),
+        lencanaPertanyaan(p.punyaPertanyaan),
+        tombolTindakan(p)
+      ]));
+    }
+  }
+  $('tbody').innerHTML = gabungBaris(baris, 6);
+  $('#infoJumlah').textContent = 'Menampilkan ' + baris.length + ' dari ' + daftarPengguna.length + ' pengguna';
+}
+
+kolomCari.addEventListener('input', tampilkan);
+filterLevel.addEventListener('change', tampilkan);
+
+function ubahLevel(p) {
+  var levelBaru = p.level === 'admin' ? 'user' : 'admin';
+  var judul = levelBaru === 'admin' ? 'Jadikan admin?' : 'Jadikan user biasa?';
+  var akibat = levelBaru === 'admin'
+    ? p.nama + ' akan bisa mengubah dan menghapus data, serta mengelola pengguna.'
+    : p.nama + ' tidak akan bisa lagi mengubah dan menghapus data.';
+
+  Swal.fire({
+    icon: 'question',
+    title: judul,
+    text: akibat + ' Berlaku setelah ia masuk ulang.',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, ubah',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#4F46E5',
+    cancelButtonColor: '#8A90AD',
+    reverseButtons: true
+  }).then(async function (hasil) {
+    if (!hasil.isConfirmed) { return; }
+    try {
+      await panggilApi('/pengguna/' + p.id + '/level', 'PUT', { level: levelBaru });
+      await muatData();
+      popupSukses('Level berhasil diubah!', p.username + ' sekarang ' + (levelBaru === 'admin' ? 'Admin' : 'User'));
+    } catch (error) {
+      popupPeringatan(error.message, 'Level gagal diubah');
+    }
+  });
+}
+
+function resetPassword(p) {
+  Swal.fire({
+    icon: 'warning',
+    title: 'Reset password',
+    text: 'Masukkan password baru untuk ' + p.username + '. Sampaikan password ini kepada pemiliknya.',
+    input: 'password',
+    inputPlaceholder: 'Minimal 6 karakter',
+    inputAttributes: { autocomplete: 'new-password' },
+    showCancelButton: true,
+    confirmButtonText: 'Reset',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#4F46E5',
+    cancelButtonColor: '#8A90AD',
+    reverseButtons: true,
+    preConfirm: function (nilai) {
+      if (!nilai || nilai.length < 6) {
+        Swal.showValidationMessage('Password baru minimal 6 karakter.');
+        return false;
+      }
+      return nilai;
+    }
+  }).then(async function (hasil) {
+    if (!hasil.isConfirmed) { return; }
+    try {
+      await panggilApi('/pengguna/' + p.id + '/password', 'PUT', { passwordBaru: hasil.value });
+      popupSukses('Password berhasil direset!', p.username);
+    } catch (error) {
+      popupPeringatan(error.message, 'Password gagal direset');
+    }
+  });
+}
+
+document.addEventListener('click', function (e) {
+  var tombol = e.target.closest('[data-tindakan]');
+  if (tombol === null) { return; }
+  e.preventDefault();
+  var p = cari(daftarPengguna, tombol.getAttribute('data-id'));
+  if (p === null) { return; }
+  if (tombol.getAttribute('data-tindakan') === 'level') {
+    ubahLevel(p);
+  } else {
+    resetPassword(p);
+  }
+});
+
+async function mulai() {
+  try {
+    akuSendiri = await ambilPengguna();
+  } catch (error) {
+    $('#halaman').classList.remove('invisible');
+    popupPeringatan(error.message, 'Gagal memuat data');
+    return;
+  }
+  if (akuSendiri.level !== 'admin') {
+    window.location.href = 'index.html';
+    return;
+  }
+  $('#halaman').classList.remove('invisible');
+  await muatData();
+}
+
+mulai();
+  </script>
+</body>
+</html>
