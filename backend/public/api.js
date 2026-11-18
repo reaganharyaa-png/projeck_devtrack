@@ -17,7 +17,7 @@ async function panggilApi(alamat, metode, isi) {
 
     var tanpaAlihLogin = ['/login', '/lupa/reset'];
   if (respons.status === 401 && tanpaAlihLogin.indexOf(alamat) === -1) {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
     return new Promise(function () {});
   }
 

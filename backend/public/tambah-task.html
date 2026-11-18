@@ -10,7 +10,7 @@
 </head>
 <body class="bg-[#F6F7FB] text-[#1B1F3B]">
   <header class="border-b border-[#E7E9F2] bg-white px-5 py-5 md:px-10">
-    <a href="index.html" class="text-sm text-[#3730A3]">&larr; Kembali ke Dashboard</a>
+    <a href="/" class="text-sm text-[#3730A3]">&larr; Kembali ke Dashboard</a>
     <h1 class="mt-2 text-2xl font-bold">Tambah Task</h1>
   </header>
 
@@ -26,7 +26,7 @@
         <div class=""><label for="ts" class="mb-1.5 block text-[13px] font-semibold">Tanggal selesai</label><input id="ts" type="date" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><p class="mt-1.5 text-xs text-[#5B6080]">Kosongkan jika task belum selesai</p></div>
       </div>
       <div class="mt-7 flex justify-end gap-3">
-        <a href="index.html" class="inline-flex h-11 items-center rounded-lg border border-[#8A90AD] bg-white px-5 text-sm font-semibold">Batal</a>
+        <a href="/" class="inline-flex h-11 items-center rounded-lg border border-[#8A90AD] bg-white px-5 text-sm font-semibold">Batal</a>
         <button type="submit" class="h-11 rounded-lg bg-[#4F46E5] px-6 text-sm font-semibold text-white hover:opacity-90">Simpan Task</button>
       </div>
     </form>
@@ -91,7 +91,7 @@ async function siapkanForm() {
       var pengguna = await ambilPengguna();
       if (pengguna.level !== 'admin') {
         await popupPeringatan('Hanya admin yang boleh mengubah data.', 'Akses ditolak');
-        window.location.href = 'task.html';
+        window.location.href = '/task';
         return;
       }
     }
@@ -171,11 +171,11 @@ form.addEventListener('submit', async function (e) {
     if (idEdit !== null) {
       hasil = await panggilApi('/task/' + encodeURIComponent(idEdit), 'PUT', isi);
       pesan = 'Task berhasil diubah!';
-      tujuan = 'task.html';
+      tujuan = '/task';
     } else {
       hasil = await panggilApi('/task', 'POST', isi);
       pesan = 'Task berhasil disimpan!';
-      tujuan = 'index.html';
+      tujuan = '/';
     }
     popupSukses(pesan, hasil.id + ' - ' + nama, function () {
       window.location.href = tujuan;

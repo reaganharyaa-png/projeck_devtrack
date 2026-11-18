@@ -23,16 +23,16 @@
   function keluar() {
     panggilApi('/logout', 'POST')
       .catch(function () {})
-      .then(function () { window.location.href = 'login.html'; });
+      .then(function () { window.location.href = '/login'; });
   }
 
   function pasangKotak(pengguna) {
     var sidebar = document.querySelector('aside.shrink-0');
 
     if (sidebar) {
-      if (pengguna.level === 'admin' && !sidebar.querySelector('a[href="pengguna.html"]')) {
+      if (pengguna.level === 'admin' && !sidebar.querySelector('a[href="/pengguna"]')) {
         var menuPengguna = document.createElement('a');
-        menuPengguna.href = 'pengguna.html';
+        menuPengguna.href = '/pengguna';
         menuPengguna.className = 'rounded-lg px-3 py-[11px] text-sm font-medium text-[#3A3F63]';
         menuPengguna.textContent = 'Pengguna';
         sidebar.appendChild(menuPengguna);

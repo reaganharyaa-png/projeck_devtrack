@@ -50,6 +50,62 @@ app.use('/api', function (req, res) {
   res.status(404).json({ pesan: 'Alamat API tidak ditemukan.' });
 });
 
+app.get('/', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'index.html');
+  res.sendFile(filePath);
+});
+
+app.get('/developer', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'developer.html');
+  res.sendFile(filePath);
+});
+
+app.get('/login', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'login.html');
+  res.sendFile(filePath);
+});
+
+app.get('/lupa-password', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'lupa-password.html');
+  res.sendFile(filePath);
+});
+
+app.get('/pengguna', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'pengguna.html');
+  res.sendFile(filePath);
+});
+
+app.get('/prioritas', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'prioritas.html');
+  res.sendFile(filePath);
+});
+
+app.get('/register', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'register.html');
+  res.sendFile(filePath);
+});
+
+app.get('/role', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'role.html');
+  res.sendFile(filePath);
+});
+
+app.get('/tambah-developer', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'tambah-developer.html');
+  res.sendFile(filePath);
+});
+
+app.get('/tambah-task', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'tambah-task.html');
+  res.sendFile(filePath);
+});
+
+app.get('/task', (req, res) => {
+  const filePath = path.join(__dirname, 'public', 'task.html');
+  res.sendFile(filePath);
+});
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function (error, req, res, next) {

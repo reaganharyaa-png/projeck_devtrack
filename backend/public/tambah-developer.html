@@ -10,7 +10,7 @@
 </head>
 <body class="bg-[#F6F7FB] text-[#1B1F3B]">
   <header class="border-b border-[#E7E9F2] bg-white px-5 py-5 md:px-10">
-    <a href="developer.html" class="text-sm text-[#3730A3]">&larr; Kembali ke Developer</a>
+    <a href="/developer" class="text-sm text-[#3730A3]">&larr; Kembali ke Developer</a>
     <h1 class="mt-2 text-2xl font-bold">Tambah Developer</h1>
   </header>
 
@@ -23,14 +23,14 @@
         <div class=""><label for="cp" class="mb-1.5 block text-[13px] font-semibold">Capacity point</label><input id="cp" type="number" min="1" value="20" class="h-11 w-full rounded-lg border border-[#8A90AD] bg-white px-3 text-sm text-[#1B1F3B]"><p class="mt-1.5 text-xs text-[#5B6080]">Jumlah poin kerja maksimal yang bisa diambil developer</p></div>
       </div>
       <div class="mt-7 flex justify-end gap-3">
-        <a href="developer.html" class="inline-flex h-11 items-center rounded-lg border border-[#8A90AD] bg-white px-5 text-sm font-semibold">Batal</a>
+        <a href="/developer" class="inline-flex h-11 items-center rounded-lg border border-[#8A90AD] bg-white px-5 text-sm font-semibold">Batal</a>
         <button type="submit" class="h-11 rounded-lg bg-[#4F46E5] px-6 text-sm font-semibold text-white hover:opacity-90">Simpan Developer</button>
       </div>
     </form>
 
     <aside class="rounded-xl border border-[#E7E9F2] bg-white w-full self-start p-5 text-[13px] leading-[1.6] lg:w-[300px]">
       <h2 class="mb-2 text-sm font-semibold">Catatan</h2>
-      <p><b>Role</b> diambil dari tabel role. Role baru bisa ditambah di halaman <a href="role.html" class="font-semibold text-[#3730A3]">Role</a>.</p>
+      <p><b>Role</b> diambil dari tabel role. Role baru bisa ditambah di halaman <a href="/role" class="font-semibold text-[#3730A3]">Role</a>.</p>
       <p class="mt-2"><b>Capacity point</b> dipakai untuk menghitung beban kerja developer di Dashboard.</p>
       <p class="mt-2"><b>ID</b> dibuat otomatis oleh sistem.</p>
     </aside>
@@ -88,7 +88,7 @@ async function siapkanForm() {
       var pengguna = await ambilPengguna();
       if (pengguna.level !== 'admin') {
         await popupPeringatan('Hanya admin yang boleh mengubah data.', 'Akses ditolak');
-        window.location.href = 'developer.html';
+        window.location.href = '/developer';
         return;
       }
     }
@@ -144,7 +144,7 @@ form.addEventListener('submit', async function (e) {
       pesan = 'Developer berhasil disimpan!';
     }
     popupSukses(pesan, hasil.id + ' - ' + nama, function () {
-      window.location.href = 'developer.html';
+      window.location.href = '/developer';
     });
   } catch (error) {
     popupPeringatan(error.message, 'Developer gagal disimpan');
